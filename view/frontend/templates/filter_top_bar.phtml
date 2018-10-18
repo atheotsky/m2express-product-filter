@@ -1,0 +1,57 @@
+<div id="filter-top-bar" class="btn-group">
+    <nav>
+        <ul class="menu filter-options">
+            <?php
+            $filterBar = $block->getAllFilterableAttributes();
+            echo '<li><a href="javascript:void(0);" class="filter-btn" data-filter="*">ALL</a></li>';
+            foreach ($filterBar as $item) {
+                $parentCode = $item['code'];
+                echo '<li><a href="javascript:void(0);" class="btn btn--primary">'.$item['name'].'</a><ul class="sub-menu">';
+                foreach ($item['data'] as $optionValue) {
+                    echo '<li><a href="javascript:void(0);" data-filter=".'.$parentCode.'-'.$optionValue['value'].'" data-value="'.$optionValue['value'].'" class="btn btn--primary filter-btn">'.$optionValue['label'].'</a></li>';
+                }
+                echo '</ul></li>';
+            }
+            ?>
+        </ul>
+    </nav>
+</div>
+
+<script>
+    requirejs([
+            'jquery',
+            'Magento_Ui/js/modal/modal',
+            'owlCarousel'
+        ],
+        function($, owlCarousel, modal) {
+            $(document).ready(function() {
+                /* animate filter */
+                var owl = $('.owl-carousel');
+                var owlAnimateFilter = function(even) {
+                    $(this)
+                        .addClass('__loading')
+                        .delay(70 * $(this).parent().index())
+                        .queue(function() {
+                            $(this).dequeue().removeClass('__loading')
+                        })
+                }
+
+                $(".filter-btn").on( "click", function(e) {
+                    var filter_data = $(this).data('filter');
+
+                    /* return if current */
+                    if($(this).hasClass('btn-active')) return;
+
+                    /* active current */
+                    $('.btn-active').removeClass('btn-active');
+                    $(this).addClass('btn-active');
+                    //$(this).toggleClass('btn-active').siblings().removeClass('btn-active');
+
+                    /* Filter */
+                    owl.owlFilter(filter_data, function(_owl) {
+                        $(_owl).find('.item').each(owlAnimateFilter);
+                    });
+                });
+            });
+        });
+</script>

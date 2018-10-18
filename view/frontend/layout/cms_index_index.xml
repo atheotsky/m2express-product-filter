@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <link src="M2express_ProductFilter::js/jquery.owl-filter.js"/>
+        <css src="M2express_ProductFilter::css/filter-m.css" />
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <referenceBlock name="before.body.end">
+                <block class="M2express\ProductFilter\Block\Filter" name="onepage.filter.link" after="minicart"
+                       template="M2express_ProductFilter::filter_top_bar.phtml" />
+            </referenceBlock>
+        </referenceContainer>
+    </body>
+</page>
