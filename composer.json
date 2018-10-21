@@ -1,5 +1,5 @@
 {
-    "name": "m2express/productfilter",
+    "name": "m2express/product-filter",
     "description": "product filter component for theme",
     "type": "magento2-module",
     "license": "proprietary",
