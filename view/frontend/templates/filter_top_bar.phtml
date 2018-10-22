@@ -2,13 +2,12 @@
     <nav>
         <ul class="menu filter-options">
             <?php
-            $filterBar = $block->getAllFilterableAttributes();
             echo '<li><a href="javascript:void(0);" class="filter-btn" data-filter="*">ALL</a></li>';
-            foreach ($filterBar as $item) {
-                $parentCode = $item['code'];
-                echo '<li><a href="javascript:void(0);" class="btn btn--primary">'.$item['name'].'</a><ul class="sub-menu">';
-                foreach ($item['data'] as $optionValue) {
-                    echo '<li><a href="javascript:void(0);" data-filter=".'.$parentCode.'-'.$optionValue['value'].'" data-value="'.$optionValue['value'].'" class="btn btn--primary filter-btn">'.$optionValue['label'].'</a></li>';
+            $topMenuArr = $block->getLayerFilterable();
+            foreach ($topMenuArr as $k) {
+                echo '<li><a href="javascript:void(0);" class="btn btn--primary">'.$k['name'].'</a><ul class="sub-menu">';
+                foreach ($k['data'] as $optionValue) {
+                    echo '<li><a href="javascript:void(0);" data-filter=".'.strtolower($k['code']).'-'.$optionValue['label'].'" data-value="'.$optionValue['label'].'" class="btn btn--primary filter-btn">'.$optionValue['display'].' ('.$optionValue['count'].')</a></li>';
                 }
                 echo '</ul></li>';
             }

@@ -10,6 +10,9 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Catalog\Model\Layer\Category\FilterableAttributeList;
+use Magento\Catalog\Model\Layer\FilterList;
+use Magento\Catalog\Model\Layer\Resolver;
+use Magento\Framework\ObjectManagerInterface;
 use M2express\ProductFilter\Helper\Data;
 
 class Filter extends \Magento\Framework\View\Element\Template
@@ -19,16 +22,25 @@ class Filter extends \Magento\Framework\View\Element\Template
     protected $filterHelper;
     protected $filterableAttributeList;
     protected $filterList;
+    protected $_layerResolver;
+    protected $layerState;
+    protected $_objectManager;
 
     public function __construct(
         Context $context,
         ScopeConfigInterface $scopeConfig,
         FilterableAttributeList $filterableAttributeList,
+        FilterList $filterList,
+        Resolver $resolver,
+        ObjectManagerInterface $objectManager,
         Data $filterHelper
     ) {
         $this->_scopeConfig = $scopeConfig;
         $this->filterHelper = $filterHelper;
         $this->filterableAttributeList = $filterableAttributeList;
+        $this->filterList = $filterList;
+        $this->_layerResolver = $resolver->get();
+        $this->_objectManager = $objectManager;
         parent::__construct($context);
     }
 
@@ -58,6 +70,7 @@ class Filter extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Get all filterable attributes
      * @return \Magento\Catalog\Model\Layer\Filter\Item[]
      */
     public function getAllFilterableAttributes()
@@ -74,5 +87,43 @@ class Filter extends \Magento\Framework\View\Element\Template
         }
 
         return $result;
+    }
+
+    /**
+     * Get filter from layer resolver by category id
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getLayerFilterable()
+    {
+        $homeCategoryId = $this->_scopeConfig->getValue(
+            'm2express_home2steps/general/home_category',
+            ScopeConfigInterface::SCOPE_TYPE_DEFAULT
+        );
+        $this->_layerResolver->setCurrentCategory($homeCategoryId);
+        $fill = $this->_objectManager->create(FilterableAttributeList::class);
+        $filterList = new FilterList($this->_objectManager, $fill);
+        $filterAttributes = $filterList->getFilters($this->_layerResolver);
+        $filterArray = [];
+        $i = 0;
+
+        foreach ($filterAttributes as $filter) {
+            $items = $filter->getItems(); //Gives all available filter options in that particular filter
+            $filterValues = [];
+            $j = 0;
+            foreach ($items as $item) {
+                $filterValues[$j]['display'] = strip_tags($item->getLabel());
+                $filterValues[$j]['label'] = $item->getValue();
+                $filterValues[$j]['count'] = $item->getCount(); //Gives no. of products in each filter options
+                $j++;
+            }
+            if (!empty($filterValues)) {
+                $availableFilter = ['code' => $filter->getRequestVar(),
+                    'name' => $filter->getName(), 'data' => $filterValues];
+                $filterArray[] =  $availableFilter;
+            }
+            $i++;
+        }
+        return $filterArray;
     }
 }
