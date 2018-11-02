@@ -25,6 +25,7 @@ class Filter extends \Magento\Framework\View\Element\Template
     protected $_layerResolver;
     protected $layerState;
     protected $_objectManager;
+    protected $_currentCategory;
 
     public function __construct(
         Context $context,
@@ -89,6 +90,27 @@ class Filter extends \Magento\Framework\View\Element\Template
         return $result;
     }
 
+    public function setCurrentCategory($categoryId)
+    {
+        $this->_currentCategory = $categoryId;
+    }
+
+    public function getCurrentCategory()
+    {
+        if($this->hasData('category')) {
+            return $this->getData('category');
+        } else {
+            if($this->_currentCategory) {
+                return $this->_currentCategory;
+            } else {
+                return $this->_scopeConfig->getValue(
+                    'm2express_home2steps/general/home_category',
+                    ScopeConfigInterface::SCOPE_TYPE_DEFAULT
+                );
+            }
+        }
+    }
+
     /**
      * Get filter from layer resolver by category id
      * @return array
@@ -96,10 +118,7 @@ class Filter extends \Magento\Framework\View\Element\Template
      */
     public function getLayerFilterable()
     {
-        $homeCategoryId = $this->_scopeConfig->getValue(
-            'm2express_home2steps/general/home_category',
-            ScopeConfigInterface::SCOPE_TYPE_DEFAULT
-        );
+        $homeCategoryId = $this->getCurrentCategory();
         $this->_layerResolver->setCurrentCategory($homeCategoryId);
         $fill = $this->_objectManager->create(FilterableAttributeList::class);
         $filterList = new FilterList($this->_objectManager, $fill);

@@ -3,12 +3,4 @@
     <head>
         <css src="M2express_ProductFilter::css/filter-m.css" />
     </head>
-    <body>
-        <referenceContainer name="content">
-            <referenceBlock name="before.body.end">
-                <block class="M2express\ProductFilter\Block\Filter" name="onepage.filter.link" after="minicart"
-                       template="M2express_ProductFilter::filter_top_bar.phtml" />
-            </referenceBlock>
-        </referenceContainer>
-    </body>
 </page>
